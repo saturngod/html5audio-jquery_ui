@@ -1,0 +1,250 @@
+<html>
+<head>
+<title>HTML5 Video and jQuery</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script src="js/jquery-ui-1.8.1.custom.min.js" type="text/javascript"></script>
+<link type="text/css" href="css/redmond/jquery-ui-1.8.1.custom.css" rel="stylesheet" />
+
+<style>
+*
+{
+	outline: none;
+}
+ul.button_list
+{
+	list-style: none;
+	padding: 0px;
+	margin: 0px;
+	margin-bottom: 15px;
+	margin-left: 40px;
+}
+
+ul.button_list li
+{
+	display: inline;
+}
+
+#seekbar
+{
+	width: 500px;
+	margin-left: 50px;
+}
+
+#volume
+{
+	width: 200px;
+	margin-left: 50px;
+}
+
+#lbl_volume
+{
+	margin-left: 50px;
+}
+
+#timer
+{
+	margin-left: 50px;
+	margin-bottom: 10px;
+}
+
+ul.playlist
+{
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	margin-bottom: 15px;
+	margin-left: 40px;
+}
+
+ul.playlist li
+{
+	background-color: #EEF6FD;
+	color: #486E9E;
+	border-bottom: 1px solid #FFFFFF;
+	border-top: 1px solid #BCD6E9;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 5px;
+}
+
+ul.playlist li a
+{
+	color:#486E9E ;
+	text-decoration: none;
+	outline: none;
+	
+}
+
+ul.playlist li.current
+{
+	background-color: #C1DEF8;
+
+}
+
+ul.playlist li.current a
+{
+	font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<ul class="button_list">
+<li><a href="#" id="play">Play</a></li>
+<li><a href="#" id="pause">Pause</a></li>
+<li><a href="#" id="stop">Stop</a></li>
+</ul>
+
+<div id="lbl_volume">Volume:</div>
+<div id="volume"></div>
+<div id="lbl_volume">Timer:</div>
+<div id="timer">00:00/00:00</div>
+
+<div id="seekbar"></div>
+<br/>
+<ul class="playlist">
+	<li class="current"><a class="track" href="Track01">Please! Believe In Love</a></li>
+	<li><a class="track" href="Track02">Waiting you come back</a></li>
+	<li><a class="track" href="Track03">Do You Love Me ?</a></li>
+	<li><a class="track" href="Track04">Miss U</a></li>
+</ul>
+<script>
+
+//Initalize audio Element
+var audioElement = document.createElement('audio');
+$(document).ready(function(){
+
+	
+	$current=$('.current');
+	//Initalize file base on browser
+	if(jQuery.browser.mozilla || jQuery.browser.opera)
+	{	
+		audioElement.setAttribute('src', 'music/Track01.ogg');
+	}
+	else
+	{
+		audioElement.setAttribute('src', 'music/Track01.mp3');
+	}
+	
+	
+	//load audio file
+	audioElement.volume=0.5;
+	audioElement.load();
+	//audioElement.play();
+	
+	
+	
+	
+	//Start jQuery UI
+	
+	//UI Button
+	$("#play,#pause,#stop").button();
+	
+	//seekbar slider
+	$("#seekbar").slider();
+	$("#seekbar").slider( "option", "min", 0);
+	$("#seekbar").slider( "option", "animate", true );
+	
+	//volume slider
+	$("#volume").slider();
+	$("#volume").slider( "option", "min", 0);
+	$("#volume").slider( "option", "max", 10);
+	$("#volume").slider( "option", "value", 5);
+	
+	
+	$("#volume").slider({
+	   stop: function() {
+	   	audioElement.volume=$( "#volume" ).slider( "option", "value")/10;
+	   }
+	});
+	
+	/********* Event ***********/
+	
+	//play
+	$("#play").click(function(){
+		audioElement.play();
+	});
+	
+	
+	//pause
+	$("#pause").click(function(){
+		
+		audioElement.pause();
+	});
+	
+	
+	//stop
+	$("#stop").click(function(){
+		audioElement.pause();
+		audioElement.currentTime=0;
+	});
+	
+	
+	//change track number
+	$(".track").click(function(){
+		
+		file=$(this).attr("href");
+		
+		$parent=$(this).parent("li");
+		$current.removeClass('current');
+		$current=$parent;
+		$current.addClass('current');
+		
+		if(jQuery.browser.mozilla || jQuery.browser.opera)
+		{	
+			audioElement.setAttribute('src', 'music/'+file+'.ogg');
+		}
+		else
+		{
+			audioElement.setAttribute('src', 'music/'+file+'.mp3');
+		}
+		audioElement.load();
+		audioElement.play();
+		
+		
+		return false;
+		
+	});
+	
+	$( "#seekbar" ).slider({
+	   stop: function() {
+	   	audioElement.currentTime=$( "#seekbar" ).slider( "option", "value");
+	   }
+	});
+	
+	 setInterval( "audio_seek()", 1000 );
+	
+	
+	
+
+});
+
+function audio_seek()
+{
+	$("#seekbar").slider( "option", "max", audioElement.duration);
+	$("#volume").slider( "option", "animate", true );
+	
+	//calculate total mm:ss
+	total_sec=audioElement.duration;
+	total_min=total_sec/60;
+	total_min=parseInt(total_min);
+	total_sec=total_sec % 60;
+	total_sec=parseInt(total_sec);
+	
+	//calculate current mm:ss
+	cur_time=audioElement.currentTime;
+	cur_min=cur_time/60;
+	cur_min=parseInt(cur_min);
+	cur_sec=cur_time % 60;
+	cur_sec=parseInt(cur_sec);
+	
+	
+	$("#timer").html(cur_min+":"+cur_sec+" / "+total_min+":"+total_sec);
+	
+	$( "#seekbar" ).slider( "option", "value", audioElement.currentTime );
+	
+}
+</script>
+
+</body>
+</html>
