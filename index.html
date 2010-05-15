@@ -141,21 +141,28 @@ $(document).ready(function(){
 	$("#play,#pause,#stop").button();
 	
 	//seekbar slider
-	$("#seekbar").slider();
+	$("#seekbar").slider({
+				range: "min",
+				min:0,
+				animate:true,
+				stop: function() {
+					audioElement.currentTime=$( "#seekbar" ).slider( "option", "value");
+				}
+	});
+	
 	$("#seekbar").slider( "option", "min", 0);
 	$("#seekbar").slider( "option", "animate", true );
-	
-	//volume slider
-	$("#volume").slider();
-	$("#volume").slider( "option", "min", 0);
-	$("#volume").slider( "option", "max", 10);
-	$("#volume").slider( "option", "value", 5);
-	
-	
+	$("#seeekbar").slider("option","range","min");
+	//volume slider	
 	$("#volume").slider({
-	   stop: function() {
-	   	audioElement.volume=$( "#volume" ).slider( "option", "value")/10;
-	   }
+				range: "min",
+				min:0,
+				max:10,
+				value:5,
+				animate:true,
+				stop: function() {
+					audioElement.volume=$( "#volume" ).slider( "option", "value")/10;
+				}
 	});
 	
 	/********* Event ***********/
@@ -205,12 +212,7 @@ $(document).ready(function(){
 		return false;
 		
 	});
-	
-	$( "#seekbar" ).slider({
-	   stop: function() {
-	   	audioElement.currentTime=$( "#seekbar" ).slider( "option", "value");
-	   }
-	});
+
 	
 	 setInterval( "audio_seek()", 1000 );
 	
