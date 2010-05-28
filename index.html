@@ -248,6 +248,7 @@ function audio_seek()
 	{
 		nextTrack();
 	}
+	
 	$("#timer").html(cur_min+":"+cur_sec+" / "+total_min+":"+total_sec);
 	
 	$( "#seekbar" ).slider( "option", "value", audioElement.currentTime );
@@ -257,20 +258,21 @@ function audio_seek()
 function nextTrack()
 {
 		
-		
+		//remove current class
+		$current.removeClass('current');
+			
 		if($current.hasClass('endlist'))
 		{
-			//remove current class
-			$current.removeClass('current');
+			
 			$current=$('.playlist > li:first');
 		}
 		else
 		{
-			
+			$current.removeClass('current');
 			$current=$current.next("li");
 			
-			//remove current class
-			$current.removeClass('current');
+			
+			
 		}
 		$current.addClass('current');
 		
