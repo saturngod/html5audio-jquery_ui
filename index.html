@@ -106,19 +106,21 @@ ul.playlist li.current a
 	<li class="current"><a class="track" href="Track01">Please! Believe In Love</a></li>
 	<li><a class="track" href="Track02">Waiting you come back</a></li>
 	<li><a class="track" href="Track03">Do You Love Me ?</a></li>
-	<li><a class="track" href="Track04">Miss U</a></li>
+	<li class="endlist"><a class="track" href="Track04">Miss U</a></li>
 </ul>
 
 <div id="information"></div>
-<script>
+<script type="text/javascript">
 
-//Initalize audio Element
+//Initialize audio Element
 var audioElement = document.createElement('audio');
+var $current;
 $(document).ready(function(){
 
-	
+	//set current track
 	$current=$('.current');
-	//Initalize file base on browser
+	
+	//Initialize file base on browser
 	if(jQuery.browser.mozilla || jQuery.browser.opera)
 	{	
 		audioElement.setAttribute('src', 'music/Track01.ogg');
@@ -152,9 +154,6 @@ $(document).ready(function(){
 				}
 	});
 	
-	$("#seekbar").slider( "option", "min", 0);
-	$("#seekbar").slider( "option", "animate", true );
-	$("#seeekbar").slider("option","range","min");
 	//volume slider	
 	$("#volume").slider({
 				range: "min",
@@ -216,7 +215,9 @@ $(document).ready(function(){
 	});
 
 	
-	 setInterval( "audio_seek()", 1000 );
+	//Interval for seekbar tracking
+	
+	setInterval( "audio_seek()", 1000 );
 	
 	jQuery.each(jQuery.browser, function(i, val) {
 	    $("#information").append("<div><b>"+i+" : </b>"+val+"</div>");
@@ -228,7 +229,6 @@ $(document).ready(function(){
 function audio_seek()
 {
 	$("#seekbar").slider( "option", "max", audioElement.duration);
-	$("#volume").slider( "option", "animate", true );
 	
 	//calculate total mm:ss
 	total_sec=audioElement.duration;
@@ -244,11 +244,49 @@ function audio_seek()
 	cur_sec=cur_time % 60;
 	cur_sec=parseInt(cur_sec);
 	
-	
+	if(audioElement.currentTime == audioElement.duration && audioElement.duration !=0  )
+	{
+		nextTrack();
+	}
 	$("#timer").html(cur_min+":"+cur_sec+" / "+total_min+":"+total_sec);
 	
 	$( "#seekbar" ).slider( "option", "value", audioElement.currentTime );
 	
+}
+
+function nextTrack()
+{
+		
+		
+		if($current.hasClass('endlist'))
+		{
+			//remove current class
+			$current.removeClass('current');
+			$current=$('.playlist > li:first');
+		}
+		else
+		{
+			
+			$current=$current.next("li");
+			
+			//remove current class
+			$current.removeClass('current');
+		}
+		$current.addClass('current');
+		
+		//Initialize file
+		file=$('.current > a').attr('href');
+		
+		if(jQuery.browser.mozilla || jQuery.browser.opera)
+		{	
+			audioElement.setAttribute('src', 'music/'+file+'.ogg');
+		}
+		else
+		{
+			audioElement.setAttribute('src', 'music/'+file+'.mp3');
+		}
+		audioElement.load();
+		audioElement.play();
 }
 </script>
 
